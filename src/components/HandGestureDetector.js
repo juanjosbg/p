@@ -21,7 +21,6 @@ function HandGestureDetector({ onGestureDetected }) {
     }, 10);
   };
 
-    // Función para detectar gestos
   const detect = async (net) => {
     if (
       typeof webcamRef.current !== "undefined" &&
