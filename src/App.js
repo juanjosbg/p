@@ -16,6 +16,10 @@ import Webcam from "react-webcam";
 import "./App.css";
 import { drawHand } from "./utilities";
 
+import { rockGesture } from "./components/rockGesture";
+import { paperGesture } from "./components/paperGesture";
+import { scissorsGesture } from "./components/scissorsGesture";
+
 ///////// NEW STUFF IMPORTS
 import * as fp from "fingerpose";
 import victory from "./victory.png";
@@ -65,11 +69,13 @@ function App() {
       // console.log(hand);
 
       ///////// NEW STUFF ADDED GESTURE HANDLING
-
       if (hand.length > 0) {
         const GE = new fp.GestureEstimator([
-          fp.Gestures.VictoryGesture,
+          //fp.Gestures.VictoryGesture,
           fp.Gestures.ThumbsUpGesture,
+          rockGesture,
+          paperGesture,
+          scissorsGesture,
         ]);
         const gesture = await GE.estimate(hand[0].landmarks, 4);
         if (gesture.gestures !== undefined && gesture.gestures.length > 0) {
@@ -81,6 +87,30 @@ function App() {
           const maxConfidence = confidence.indexOf(
             Math.max.apply(null, confidence)
           );
+
+          const recognizedGesture = gesture.gestures[maxConfidence].name;
+          console.log("Gesto reconocido:", recognizedGesture);
+
+          if (
+            recognizedGesture === "rock" ||
+            recognizedGesture === "paper" ||
+            recognizedGesture === "scissors"
+          ) {
+            // Aquí necesitarás definir las imágenes para 'rock', 'paper' y 'scissors'
+            const rpsImages = {
+              rock: "URL_O_RUTA_IMAGEN_ROCK",
+              paper: "URL_O_RUTA_IMAGEN_PAPER",
+              scissors: "URL_O_RUTA_IMAGEN_SCISSORS",
+            };
+            if (rpsImages[recognizedGesture]) {
+              setEmoji(recognizedGesture);
+            } else {
+              setEmoji(null); // Si no hay imagen definida para el gesto RPS
+            }
+          } else {
+            setEmoji(null); // No mostrar emoji para otros gestos (victoria, pulgar arriba)
+          }
+
           // console.log(gesture.gestures[maxConfidence].name);
           setEmoji(gesture.gestures[maxConfidence].name);
           console.log(emoji);
@@ -95,7 +125,9 @@ function App() {
     }
   };
 
-  useEffect(()=>{runHandpose()},[]);
+  useEffect(() => {
+    runHandpose();
+  }, []);
 
   return (
     <div className="App">
